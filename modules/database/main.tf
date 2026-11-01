@@ -16,6 +16,7 @@ resource "aws_db_instance" "rds_instance" {
   storage_encrypted           = true
   identifier                  = "${var.db_subnet_group_name}-mysql-instance"
   engine                      = "mysql"
+  engine_version              = "8.4.11"
   username                    = var.db_username
   manage_master_user_password = true
   db_subnet_group_name        = aws_db_subnet_group.db_subnet_group.name
