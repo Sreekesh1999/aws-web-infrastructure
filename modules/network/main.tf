@@ -52,6 +52,26 @@ resource "aws_subnet" "private" {
   }
 }
 
+# Create dedicated database private subnets in the VPC
+resource "aws_subnet" "db_private" {
+  count                   = length(var.db_private_subnet_cidrs)
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = var.db_private_subnet_cidrs[count.index]
+  availability_zone       = data.aws_availability_zones.available.names[count.index]
+  map_public_ip_on_launch = false
+
+  tags = {
+    Name = "aws-web-infrastructure-db-private-az${count.index + 1}"
+  }
+
+  lifecycle {
+    precondition {
+      condition     = length(data.aws_availability_zones.available.names) >= 2
+      error_message = "At least two available Availability Zones are required."
+    }
+  }
+}
+
 # Create an Internet Gateway for the VPC
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
@@ -112,6 +132,16 @@ resource "aws_route_table" "private" {
   }
 }
 
+# Create a dedicated route table for database private subnets
+resource "aws_route_table" "db_private" {
+  count  = length(aws_subnet.db_private)
+  vpc_id = aws_vpc.main.id
+
+  tags = {
+    Name = "aws-web-infrastructure-db-private-rt"
+  }
+}
+
 # Create a route in the private route table to allow internet access via NAT Gateway
 resource "aws_route" "private_nat_gateway" {
   count                  = length(aws_subnet.private)
@@ -125,4 +155,11 @@ resource "aws_route_table_association" "private" {
   count          = length(aws_subnet.private)
   subnet_id      = aws_subnet.private[count.index].id
   route_table_id = aws_route_table.private[count.index].id
+}
+
+# Associate database private subnets with the database route table
+resource "aws_route_table_association" "db_private" {
+  count          = length(aws_subnet.db_private)
+  subnet_id      = aws_subnet.db_private[count.index].id
+  route_table_id = aws_route_table.db_private[count.index].id
 }

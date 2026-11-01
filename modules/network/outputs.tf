@@ -17,3 +17,8 @@ output "nat_gateway_ids" {
   description = "The IDs of the NAT Gateways"
   value       = aws_nat_gateway.main[*].id
 }
+
+output "db_private_subnet_ids" {
+  description = "IDs of the dedicated database private subnets"
+  value       = aws_subnet.db_private[*].id
+}

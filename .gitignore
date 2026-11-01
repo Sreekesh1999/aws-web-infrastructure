@@ -11,3 +11,10 @@
 
 # Crash logs
 crash.log
+
+# Terraform plan files
+tfplan
+tfplan.*
+
+# Other logs
+plan.txt

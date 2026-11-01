@@ -20,3 +20,14 @@ variable "private_subnet_cidrs" {
     error_message = "The number of private subnets must match the number of public subnets."
   }
 }
+
+variable "db_private_subnet_cidrs" {
+  description = "CIDR blocks for dedicated database private subnets"
+  type        = list(string)
+  default     = ["10.0.21.0/24", "10.0.22.0/24"]
+
+  validation {
+    condition     = length(var.db_private_subnet_cidrs) == length(var.public_subnet_cidrs)
+    error_message = "The number of database private subnets must match the number of public subnets."
+  }
+}

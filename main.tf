@@ -31,7 +31,7 @@ module "compute" {
 module "database" {
   source               = "./modules/database"
   db_subnet_group_name = "aws-web-infrastructure"
-  subnet_ids           = module.network.private_subnet_ids
+  subnet_ids           = module.network.db_private_subnet_ids
   db_instance_class    = "db.t3.micro"
   allocated_storage    = 20
   db_username          = var.db_username
