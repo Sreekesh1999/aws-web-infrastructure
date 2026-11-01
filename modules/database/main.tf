@@ -8,12 +8,17 @@ resource "aws_db_subnet_group" "db_subnet_group" {
 
 }
 
+data "aws_kms_alias" "rds" {
+  name = "alias/aws/rds"
+}
+
 resource "aws_db_instance" "rds_instance" {
   instance_class              = var.db_instance_class
   allocated_storage           = var.allocated_storage
   multi_az                    = true
   publicly_accessible         = false
   storage_encrypted           = true
+  kms_key_id                  = data.aws_kms_alias.rds.target_key_arn
   identifier                  = "${var.db_subnet_group_name}-mysql-instance"
   engine                      = "mysql"
   engine_version              = "8.4.11"
