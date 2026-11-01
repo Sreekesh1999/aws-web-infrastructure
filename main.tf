@@ -27,3 +27,13 @@ module "compute" {
   private_subnet_ids    = module.network.private_subnet_ids
   target_group_arns     = [module.load_balancer.target_group_arn]
 }
+
+module "database" {
+  source               = "./modules/database"
+  db_subnet_group_name = "aws-web-infrastructure"
+  subnet_ids           = module.network.private_subnet_ids
+  db_instance_class    = "db.t3.micro"
+  allocated_storage    = 20
+  db_username          = var.db_username
+  db_security_group_id = module.security.db_sg_id
+}
